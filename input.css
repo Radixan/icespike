@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    color-scheme: dark;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
+    @apply m-0 opacity-100;
+  }
+
+  html {
+    @apply h-full overflow-hidden;
+  }
+  
+  body {
+    @apply relative py-4 w-full h-full flex flex-col bg-gray-900 short:landscape:py-0 overflow-hidden;
+  }
+  
+  a {
+    @apply text-sky-500 hover:text-sky-600;
+  }
+  
+  h1 {
+    @apply text-2xl font-bold py-1;
+  }
+
+  header {
+    @apply px-10 pb-4 text-sm leading-4 short:landscape:hidden;
+  }
+
+  footer {
+    @apply px-10 pt-6 text-sm leading-7 text-gray-400 short:landscape:hidden;
+  }
+
+  #main_content {
+    @apply relative text-base leading-7 bg-[#030712] flex flex-row w-full h-full overflow-hidden;
+  }
+
+  #renderer {
+    @apply w-full h-full overflow-hidden;
+  }
+
+  .large_button {
+    @apply text-white focus:ring-2  font-medium rounded-lg text-sm px-5 py-1.5 mr-2 mb-2 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-blue-800;
+  }
+
+  #properties_grid {
+    @apply grid grid-cols-1 lg:grid-cols-[auto,1fr] gap-y-2;
+  }
+
+  legend {
+    @apply select-none text-sm font-medium whitespace-nowrap pr-5 float-left;
+  }
+
+  iconify-icon {
+    @apply can-hover:hidden;
+  }
+
+  legend:has(> iconify-icon) {
+    @apply hover:text-blue-300 cursor-help select-none;
+  }
+
+  .input_container {
+    @apply flex items-center gap-3;
+  }
+
+  input[type=range] {
+    @apply w-full h-2 rounded-lg appearance-none cursor-pointer bg-gray-700 disabled:accent-gray-400;
+  }
+
+  input[type=number] {
+    @apply w-24 rounded-lg border border-gray-600 bg-gray-700 px-2 text-sm text-white disabled:text-gray-400 placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  label + input[type=number] {
+    @apply w-20 flex-1 rounded-none rounded-r-lg;
+  }
+
+  label.icon {
+    @apply inline-flex items-center rounded-l-md border border-r-0 border-gray-600 bg-gray-600 px-2 pb-0.5 text-sm text-gray-400 select-none cursor-pointer;
+  }
+
+  fieldset {
+    @apply contents;
+  }
+
+  fieldset.row {
+    @apply flex items-center lg:contents;
+  }
+
+  fieldset.row > legend {
+    @apply w-28 lg:w-auto;
+  }
+  
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    @apply block w-full text-sm border rounded-lg bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 px-2;
+  }
+  
+  label.toggle {
+    @apply relative inline-flex cursor-pointer items-center text-sm font-medium gap-3;
+  }
+
+  label.toggle > input {
+    @apply sr-only;
+  }
+
+  label.toggle > div {
+    @apply h-6 w-11 rounded-full border-gray-600 bg-gray-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''];
+  }
+
+  .toggle-checked {
+    @apply bg-blue-600 after:translate-x-full after:border-white;
+  }
+
+  .toggle-focus {
+    @apply outline-none ring-4 ring-blue-800;
+  }
+
+  #toggle_sidebar {
+    @apply absolute top-3 right-6 inline-flex items-center p-2 text-sm rounded-lg lg:hidden focus:outline-none text-gray-400 hover:bg-gray-700 bg-[#0003];
+  }
+
+  #sidebar {
+    @apply absolute right-0 top-0 lg:translate-x-0 transition-transform translate-x-full bg-[#03071288] w-full sm:w-fit h-full p-4 overflow-y-auto;
+  }
+  
+  #sidebar[data-hidden="0"] {
+    @apply translate-x-0;
+  }
+
+  #tooltip {
+    @apply absolute z-10 opacity-0 invisible pointer-events-none;
+    @apply overflow-hidden flex bottom-0 right-0;
+    @apply w-fit h-fit mr-4;
+  }
+  
+  #tooltip[data-hidden="0"] {
+    @apply transition-all duration-0 ease-linear can-hover:delay-[0.5s];
+    @apply opacity-100 visible pointer-events-auto;
+  }
+
+  #tooltip > * {
+    @apply px-3 py-2 mb-2 rounded-lg bg-gray-700 shadow-lg text-sm text-white;
+    @apply overflow-y-auto;
+  }
+
+  #tooltip ul > li {
+    list-style-type: disc;
+    list-style-position: inside;
+  }
+  
+  info {
+    @apply hidden;
+  }
+}

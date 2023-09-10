@@ -1,0 +1,10 @@
+export const AIR = 0;
+export const STONE = 1;
+export const DIRT = 3;
+export const BEDROCK = 7;
+export const OBSIDIAN = 49;
+export const ICE = 79;
+export const SNOW = 80;
+export const EMERALD_BLOCK = 133;
+export const REDSTONE_BLOCK = 152;
+export const PACKED_ICE = 174;

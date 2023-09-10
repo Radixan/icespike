@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ice Spike Simulator - By Radixán</title>
+  <link rel="stylesheet" href="./style.css"></link>
+  <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@v0.154.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@v0.154.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>Ice Spike Simulator</h1>
+    <p>A tool that simulates how Minecraft generates an Ice Spike, exposing all the parameters that define its shape.</p>
+  </header>
+  <div id="main_content">
+    <div id="renderer"></div>
+    <aside id="sidebar" data-hidden="1">
+      <button type="button" id="randomize" class="large_button">Randomize</button>
+      <form id="properties_grid" autocomplete="off">
+        <fieldset class="row">
+          <legend>Sky Color</legend>
+          <div class="inline-flex">
+            <label for="sky_checkbox" class="toggle">
+              <input type="checkbox" id="sky_checkbox" class="peer" checked/>
+              <div class="peer peer-checked:toggle-checked peer-focus:toggle-focus peer-checked:after:bg-yellow-200 peer-checked:bg-sky-300"></div>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="row">
+          <legend>Show Grid</legend>
+          <div class="inline-flex">
+            <label for="grid_checkbox" class="toggle">
+              <input type="checkbox" id="grid_checkbox" class="peer" checked/>
+              <div class="peer peer-checked:toggle-checked peer-focus:toggle-focus"></div>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset class="row">
+          <legend>
+            Show Setters <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Use a different block for each part of the spike.</strong></p>
+              <p>
+                Blocks are placed using three different calls.
+                <ul>
+                  <li><span style="color: #AAC8F3; font-weight: 500;">Upper head:</span> main cone-like part.</li>
+                  <li><span style="color: #46DA70; font-weight: 500;">Lower head:</span> y-axis reflection of the previous one.</li>
+                  <li><span style="color: #E11F08; font-weight: 500;">Shaft:</span> column generated downwards from the middle of the head.</li>
+                </ul>
+              </p>
+            </info>
+          </legend>
+          <div class="inline-flex">
+            <label for="setters_checkbox" class="toggle">
+              <input type="checkbox" id="setters_checkbox" class="peer"/>
+              <div class="peer peer-checked:toggle-checked peer-focus:toggle-focus"></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <hr class="col-span-full border-0 h-2 lg:h-4">
+        <fieldset>
+          <legend>
+            Surface Type <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Defines the type of the surface generated.</strong></p>
+              <ul>
+                <li><span style="font-weight: 500;">"Natural":</span> flat terrain depicting the basic outline of the biome.</li>
+                <li><span style="font-weight: 500;">Obstructive:</span> can't be replaced by the spike generation.</li>
+                <li><span style="font-weight: 500;">Replaceable:</span> does not obstruct the spike generation.</li>
+              </ul>
+            </info>
+          </legend>
+          <div class="input_container">
+            <select id="surface_type">
+              <option selected>"Natural"</option>
+              <option>Obstructive</option>
+              <option>Replaceable</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Surface Height</legend>
+          <div class="input_container">
+            <input type="number" id="surface_height_number" placeholder="0"/>
+            <input id="surface_height_slider" type="range"/>
+          </div>
+        </fieldset>
+
+        <fieldset id="surface_bottom_fieldset">
+          <legend>Surface Bottom</legend>
+          <div class="input_container">
+            <input type="number" id="surface_bottom_number" placeholder="0"/>
+            <input id="surface_bottom_slider" type="range"/>
+          </div>
+        </fieldset>
+        
+        <hr class="col-span-full border-0 h-2 lg:h-4">
+        
+        <fieldset>
+          <legend>
+            Spike Position <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>The position where the Spike is generated.</strong></p>
+              <p>Spikes are usually populated in the top block of a random position on the xz-plane and only if the block is <var>Snow</var>.
+                This behaviour is ignored here for the sake of visualization, and it is instead generated at the given y position.
+                This allows them to be generated under some impossible conditions.</p>
+            </info>
+          </legend>
+          <div class="input_container">
+            <div class="flex flex-1">
+              <label for="position_x" class="icon">x</label>
+              <input type="number" id="position_x" placeholder="0"/>
+            </div>
+            <div class="flex flex-1">
+              <label for="position_y" class="icon">y</label>
+              <input type="number" id="position_y" placeholder="0"/>
+            </div>
+            <div class="flex flex-1">
+              <label for="position_z" class="icon">z</label>
+              <input type="number" id="position_z" placeholder="0"/>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Head Offset <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Offsets the generation point upwards.</strong></p>
+              <p>Value range: [0-3]</p>
+              <p>Normally, when this offset is zero and is not a <term>tall spike</term>, only the upper part of the head is exposed.</p>
+            </info>
+          </legend>
+          <div class="input_container">
+            <input type="number" id="offset_y_number" placeholder="0"/>
+            <input id="offset_y_slider" type="range"/>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>
+            Head Height <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Height of the upper half of the head.</strong></p>
+              <p>Value range: [7-11]</p>
+              <p>
+                Since the lower half is a mirror of the upper half, the full head length will be twice this value minus one.
+                Head radius depends on this value, since it is calculated as half <var>Head Height</var> plus <var>Extra Thick</var>.
+                Consequently, the following properties are affected:
+              </p>
+              <ul>
+                <li>A spike can only be <var>tall</var> if radius is greater than one.</li>
+                <li>The width of the shaft is three if radius is greater than one, otherwise it is one.</li>
+              </ul>
+            </info>
+          </legend>
+          <div class="input_container">
+            <input type="number" id="height_number" placeholder="0" />
+            <input id="height_slider" type="range"/>
+          </div>
+        </fieldset>
+
+        <fieldset class="row">
+          <legend>
+            Extra Thick <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Increases the width of the spike in one.</strong></p>
+              <p>Value range: [0, 1]</p>
+              <p>
+                Head radius depends on this value, since it is calculated as half <var>Head Height</var> plus <var>Extra Thick</var>.
+                Consequently, the following properties are affected:
+              </p>
+              <ul>
+                <li>A spike can only be <var>tall</var> if radius is greater than one.</li>
+                <li>The width of the shaft is three if radius is greater than one, otherwise it is one.</li>
+              </ul>
+            </info>
+          </legend>
+          <div class="inline-flex">
+            <label for="radius_checkbox" class="toggle">
+              <input type="checkbox" id="radius_checkbox" class="peer"/>
+              <div class="peer peer-checked:toggle-checked peer-focus:toggle-focus"></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="row">
+          <legend>
+            Extra Tall <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Defines if the spike is generated <var>tall</var>.</strong></p>
+              <p>Probability: 1 out of 60</p>
+              <p>
+                A spike can only be <var>tall</var> if its width is greater than one, see <var>Head Height</var> or <var>Extra Thick</var>.
+                The amount to be incremented is defined by the following property, <var>Extra Height</var>.
+              </p>
+            </info>
+          </legend>
+          <div class="inline-flex">
+            <label for="tall_checkbox" class="toggle">
+              <input type="checkbox" id="tall_checkbox" class="peer"/>
+              <div class="peer peer-checked:toggle-checked peer-focus:toggle-focus"></div>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset id="extra_height_fieldset">
+          <legend>
+            Extra Height <iconify-icon icon="mdi:information-outline" inline></iconify-icon>
+            <info>
+              <p class="mb-2"><strong>Increment applied to the upward offset of the generation point.</strong></p>
+              <p>Value range: [10, 39]</p>
+              <p>Applied only if the spike is <var>tall</var>, see <var>Extra Tall</var>.</p>
+            </info>
+          </legend>
+          <div class="input_container">
+            <input type="number" id="extra_height_number" placeholder="0"/>
+            <input id="extra_height_slider" type="range"/>
+          </div>
+        </fieldset>
+      </form>
+    </aside>
+    <button id="toggle_sidebar" type="button">
+      <span class="sr-only">Open sidebar</span>
+      <svg class="w-6 h-6" aria-hidden="true" fill="white" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+         <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path>
+      </svg>
+    </button>
+  </div>
+  <footer>
+    <a href="https://github.com/Radixan/icespike">View source on GitHub</a> by Radixán
+  </footer>
+  <div id="tooltip" role="tooltip"><div></div></div>
+</body>
+<script type="module" src="script.js"></script>
+</html>
